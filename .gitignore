@@ -1,0 +1,16 @@
+# 登录凭证 - 绝不提交
+.env
+.env.local
+*.keyst
+
+# 依赖与产物
+node_modules/
+*.log
+
+# 原始逆向包(体积大, 可从浏览器重新抓取)
+vendor.chunk.js
+*.chunk.js
+
+# 系统
+.DS_Store
+Thumbs.db
