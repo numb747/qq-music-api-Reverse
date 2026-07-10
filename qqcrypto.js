@@ -44,9 +44,11 @@ const getSecuritySign = t1._getSecuritySign;
 const cgiEncrypt = t2.__cgiEncrypt;
 const cgiDecrypt = t2.__cgiDecrypt;
 
-console.log('getSecuritySign:', typeof getSecuritySign);
-console.log('__cgiEncrypt   :', typeof cgiEncrypt);
-console.log('__cgiDecrypt   :', typeof cgiDecrypt);
+if (process.env.QQCRYPTO_DEBUG === '1' || require.main === module) {
+  console.log('getSecuritySign:', typeof getSecuritySign);
+  console.log('__cgiEncrypt   :', typeof cgiEncrypt);
+  console.log('__cgiDecrypt   :', typeof cgiDecrypt);
+}
 
 module.exports = { getSecuritySign, cgiEncrypt, cgiDecrypt };
 
