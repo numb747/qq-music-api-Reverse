@@ -27,11 +27,12 @@ import com.example.qqmusic.core.model.Song
 fun SearchScreen(
     onSongClick: (Song) -> Unit,
     onOpenVip: () -> Unit,
+    modifier: Modifier = Modifier,
     vm: SearchViewModel = viewModel(),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = modifier.fillMaxWidth().padding(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -46,8 +47,12 @@ fun SearchScreen(
             Button(onClick = vm::search) { Text("搜索") }
         }
 
-        Button(onClick = onOpenVip, modifier = Modifier.padding(top = 8.dp)) {
-            Text("开通VIP(官方页面)")
+        Row(
+            modifier = Modifier.padding(top = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Button(onClick = { vm.loadPlaylist() }) { Text("加载示例歌单") }
+            Button(onClick = onOpenVip) { Text("开通VIP(官方页面)") }
         }
 
         when {

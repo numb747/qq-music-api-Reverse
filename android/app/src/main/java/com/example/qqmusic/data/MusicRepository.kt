@@ -8,8 +8,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 /**
@@ -57,6 +59,7 @@ class MusicRepository(private val api: GatewayApi = GatewayApi()) {
         api.json.decodeFromJsonElement(PlaybackResult.serializer(), data)
     }
 
+    /** 返回明文 LRC(网关已 base64 解码) */
     suspend fun getLyric(songMID: String, songID: Long? = null): String =
         withContext(Dispatchers.IO) {
             val body: JsonObject = buildJsonObject {
@@ -64,8 +67,21 @@ class MusicRepository(private val api: GatewayApi = GatewayApi()) {
                 if (songID != null) put("songID", songID)
             }
             val data = api.post("/api/lyric", body)
-            // data: { code, data: { lyric: "..." } }
-            data.jsonObject["data"]?.jsonObject?.get("lyric")?.toString()?.trim('"') ?: ""
+            // 网关返回: { code, data: { lyric, trans, roma, ... } }
+            val lyricEl = data.jsonObject["data"]?.jsonObject?.get("lyric") ?: return@withContext ""
+            lyricEl.jsonPrimitive.content
+        }
+
+    suspend fun getPlaylist(disstid: Long, limit: Int = 30): List<Song> =
+        withContext(Dispatchers.IO) {
+            val body: JsonObject = buildJsonObject {
+                put("disstid", disstid)
+                put("limit", limit)
+            }
+            val data = api.post("/api/playlist/detail", body)
+            val list = data.jsonObject["data"]?.jsonObject?.get("songlist")?.jsonArray
+                ?: return@withContext emptyList()
+            list.map { api.json.decodeFromJsonElement(Song.serializer(), it) }
         }
 
     suspend fun getVipEntry(): VipEntry = withContext(Dispatchers.IO) {

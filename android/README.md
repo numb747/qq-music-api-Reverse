@@ -45,14 +45,17 @@ Android 侧**不含**任何加密/签名逻辑,全部委托给本地网关。等
 ## 已实现(MVP 骨架)
 
 - 搜索页:调用 `/api/search/songs` 展示歌曲列表。
+- 示例歌单:调用 `/api/playlist/detail` 加载 `2130981100` 歌单,验证歌单返回与 `vs[0]` 规则。
 - 播放:点歌 → `/api/song/playable`(网关取 `vs` 拼 filename、按音质降级)→ Media3 播放 `sip + purl`。
+- 歌词预览:点歌后调用 `/api/lyric`,网关返回明文 LRC,底部栏展示前几行。
 - VIP 入口:Custom Tabs 打开官方 `vipportal`。
 
 ## 待接续
 
-- 歌词页 `/api/lyric`(Repository 已就绪)、歌单页 `/api/playlist/detail`。
+- 完整歌词页/逐行滚动与播放进度同步。
 - 播放队列、通知栏控制、后台服务(MediaSessionService)。
 - 登录态管理(扫码/导入)与安全存储。
+- 真机局域网网关配置 UI。
 
 ## 说明
 

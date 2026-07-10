@@ -40,4 +40,16 @@ class SearchViewModel(
             }
         }
     }
+
+    fun loadPlaylist(disstid: Long = 2130981100L) {
+        _state.value = _state.value.copy(loading = true, error = null)
+        viewModelScope.launch {
+            try {
+                val songs = repo.getPlaylist(disstid)
+                _state.value = _state.value.copy(loading = false, songs = songs, query = "歌单:$disstid")
+            } catch (e: Exception) {
+                _state.value = _state.value.copy(loading = false, error = e.message ?: "加载歌单失败")
+            }
+        }
+    }
 }
