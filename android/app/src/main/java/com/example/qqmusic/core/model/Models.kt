@@ -36,6 +36,9 @@ data class PlaybackResult(
     val sip: List<String> = emptyList(),
     val purl: String = "",
     val url: String = "",
+    val quality: String? = null,
+    val filename: String? = null,
+    val reason: String? = null,
 )
 
 /** VIP 官方入口(对应 src/domain/payment.js) */

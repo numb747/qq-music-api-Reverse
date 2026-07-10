@@ -44,6 +44,30 @@ class MusicRepository(private val api: GatewayApi = GatewayApi()) {
         api.json.decodeFromJsonElement(PlaybackResult.serializer(), data)
     }
 
+    /** 一步到位: 给 songmid + songId, 网关取 vs 拼 filename 并按音质降级返回可播地址 */
+    suspend fun resolvePlayable(
+        songmid: String,
+        songId: Long,
+    ): PlaybackResult = withContext(Dispatchers.IO) {
+        val body: JsonObject = buildJsonObject {
+            put("songmid", songmid)
+            put("songId", songId)
+        }
+        val data = api.post("/api/song/playable", body)
+        api.json.decodeFromJsonElement(PlaybackResult.serializer(), data)
+    }
+
+    suspend fun getLyric(songMID: String, songID: Long? = null): String =
+        withContext(Dispatchers.IO) {
+            val body: JsonObject = buildJsonObject {
+                put("songMID", songMID)
+                if (songID != null) put("songID", songID)
+            }
+            val data = api.post("/api/lyric", body)
+            // data: { code, data: { lyric: "..." } }
+            data.jsonObject["data"]?.jsonObject?.get("lyric")?.toString()?.trim('"') ?: ""
+        }
+
     suspend fun getVipEntry(): VipEntry = withContext(Dispatchers.IO) {
         val data = api.get("/api/payment/vip-entry")
         api.json.decodeFromJsonElement(VipEntry.serializer(), data)

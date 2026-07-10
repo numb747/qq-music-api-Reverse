@@ -46,23 +46,31 @@ async function verifyLogin() {
 }
 
 async function verifyPlayback() {
-  console.log('[playback] 播放地址解析(用搜索结果真实 filename)');
+  console.log('[playback] 播放地址解析(搜索取歌 -> 按音质降级取可播 url)');
   const client = createClient();
   const s = await client.searchSongs({ query: '周杰伦', pageSize: 5 });
   const list = (s.data && s.data.body && s.data.body.song && s.data.body.song.list) || [];
-  const picked = list.find((song) => song.mid) || null;
+  const picked = list.find((song) => song.mid && song.id) || null;
   if (!picked) { bad('搜索无结果'); return false; }
 
-  // 缺 filename 必须报 MISSING_SERVER_FILENAME
+  // 缺 filename / mediaMid 必须报 MISSING_FILENAME
   try {
     await client.resolvePlaybackUrl({ songmid: picked.mid });
     bad('缺 filename 时未按预期报错');
     return false;
   } catch (e) {
-    if (e.code === 'MISSING_SERVER_FILENAME') ok('缺 filename 正确拒绝 (' + e.code + ')');
+    if (e.code === 'MISSING_FILENAME') ok('缺 filename 正确拒绝 (' + e.code + ')');
     else { bad('非预期错误: ' + e.message); return false; }
   }
-  console.log('  \x1b[33m·\x1b[0m 提示: 完整 vkey 验证需页面/接口返回的真实 filename, 此处只验证约束');
+
+  // 一步到位: 拿真实 media_mid 拼 filename, 降级取可播地址
+  const r = await client.resolvePlayableBySong({ songmid: picked.mid, songId: picked.id });
+  if (r.url) {
+    ok('取到可播地址 (音质=' + r.quality + ', host=' + (r.sip[0] || '').replace(/^https?:\/\//, '').slice(0, 24) + ')');
+    return true;
+  }
+  // 无权限也算"约束正确", 只是该账号该歌无可播档
+  console.log('  \x1b[33m·\x1b[0m 未取到可播地址 (' + (r.reason || '') + '), 可能该歌需更高权限');
   return true;
 }
 

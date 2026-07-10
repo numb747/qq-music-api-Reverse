@@ -27,6 +27,7 @@ function createClient({ session, env } = {}) {
 
     // 播放
     resolvePlaybackUrl: (opts) => playback.resolvePlaybackUrl(sess, transport, opts),
+    resolvePlayableBySong: (opts) => playback.resolvePlayableBySong(sess, transport, opts),
 
     // 歌词
     getLyric: (opts) => lyric.getLyric(sess, transport, opts),

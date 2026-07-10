@@ -45,16 +45,16 @@ Android 侧**不含**任何加密/签名逻辑,全部委托给本地网关。等
 ## 已实现(MVP 骨架)
 
 - 搜索页:调用 `/api/search/songs` 展示歌曲列表。
-- 播放控制器:`PlayerController`(Media3)接收网关解析出的播放地址。
+- 播放:点歌 → `/api/song/playable`(网关取 `vs` 拼 filename、按音质降级)→ Media3 播放 `sip + purl`。
 - VIP 入口:Custom Tabs 打开官方 `vipportal`。
 
 ## 待接续
 
-- 选歌后调 `/api/track/info` 拿真实 `filename` → `/api/playback/resolve` → Media3 播放。
-- 歌词页 `/api/lyric`、歌单页 `/api/playlist/detail`。
+- 歌词页 `/api/lyric`(Repository 已就绪)、歌单页 `/api/playlist/detail`。
+- 播放队列、通知栏控制、后台服务(MediaSessionService)。
 - 登录态管理(扫码/导入)与安全存储。
 
 ## 说明
 
-- `filename` 必须来自服务端/页面返回,客户端不合成(网关会返回 `MISSING_SERVER_FILENAME`)。
+- filename = 音质前缀 + `song.vs[0]` + 扩展名(实证规则,见根目录 `docs/常用接口清单.md`)。客户端不自行猜测,由网关 `/api/song/playable` 统一处理。
 - 明文 HTTP 仅为本地开发放开(见 `res/xml/network_security_config.xml`)。
