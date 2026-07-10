@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  仅为本地开发放开明文 HTTP:
+  - 协议网关(10.0.2.2 = 模拟器宿主机)
+  - QQ音乐播放 CDN 目前返回 http 播放地址(sip)
+  生产环境应尽量收敛为 https 并移除多余明文域。
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">qqmusic.qq.com</domain>
+        <domain includeSubdomains="true">stream.qqmusic.qq.com</domain>
+        <domain includeSubdomains="true">tc.qq.com</domain>
+    </domain-config>
+</network-security-config>

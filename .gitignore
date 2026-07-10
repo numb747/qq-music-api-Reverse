@@ -14,3 +14,15 @@ vendor.chunk.js
 # 系统
 .DS_Store
 Thumbs.db
+
+# Android 构建产物 / 本地配置
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/captures/
+*.apk
+*.aab
+*.keystore
+*.jks
