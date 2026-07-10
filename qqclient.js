@@ -49,10 +49,21 @@ function send(path, body) {
   });
 }
 
+// QQ 系 hash33: g_tk = hash33(qm_keyst, seed=5381)
+// 实测于登录态页面(见 docs/常用接口清单.md): hash33(qm_keyst)=页面实际发的 g_tk。
+// qm_keyst 为空(匿名)时循环不执行, 自动退化为 5381 —— 正好是公开接口的默认种子值。
+function hash33(t, seed = 5381) {
+  let n = seed;
+  for (let i = 0; i < t.length; i++) n += (n << 5) + t.charCodeAt(i);
+  return n & 0x7fffffff;
+}
+
 // 组装 comm 公共参数(带登录态)
 function comm() {
+  const gtk = hash33(CONFIG.qm_keyst || '');
   return { cv: 4747474, ct: 24, format: 'json', inCharset: 'utf-8', outCharset: 'utf-8',
-    notice: 0, platform: 'yqq.json', needNewCode: 1, uin: CONFIG.uin, g_tk_new_20200303: 5381, g_tk: 5381 };
+    notice: 0, platform: 'yqq.json', needNewCode: 1, uin: CONFIG.uin,
+    g_tk_new_20200303: gtk, g_tk: gtk };
 }
 
 // 批量调用: reqs = { key1:{module,method,param}, key2:{...} }, 返回 { key1:{code,data}, ... }
