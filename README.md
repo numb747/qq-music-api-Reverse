@@ -4,6 +4,21 @@ QQ 音乐 web 版(y.qq.com)请求加密/签名的独立 Node 实现,用于学习
 
 `musicu.fcg`/`musics.fcg` 接口对请求体做 AES-GCM 加密、用 SHA-1 变换生成 `sign` 签名,加解密逻辑封装在 VMP(虚拟机保护)里。本项目把 VMP 引擎抽出,在 Node 中还原了完整的加密→签名→解密链路。
 
+```
+  callQQ(module, method, param)
+       │
+       ├─> cgiEncrypt        AES-GCM 加密请求体      _enc_iife.js
+       ├─> getSecuritySign   SHA-1 变换生成 sign     _sign_iife.js
+       ├─> POST              musicu.fcg / musics.fcg
+       └─< cgiDecrypt        AES-GCM 解密响应        _enc_iife.js
+       │
+       v
+     JSON
+```
+
+三段加解密/签名逻辑原本都跑在 VMP 字节码里。`qqcrypto.js` 用 `vm` 沙箱把引擎连同两段
+自包含字节码一起加载,于是整条链路在 Node 里可独立复现,不依赖浏览器环境。
+
 ## 文件
 
 | 文件 | 说明 |
